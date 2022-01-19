@@ -11,4 +11,3 @@ class SideButton(MDFloatLayout):
 			size_hint=(1, 1),
 			on_release=action
 		))
-	

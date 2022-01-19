@@ -6,7 +6,7 @@ from kivy.uix.image import Image
 from kivy.uix.widget import Widget
 
 
-class VideoView(Image):
+class StreamView(Image):
 	def __init__(self, drone, **kwargs):
 		super().__init__(**kwargs)
 		self.drone = drone
