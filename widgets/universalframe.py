@@ -10,7 +10,7 @@ class UniversalFrame(AnchorLayout):
 
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
-
+		
 	def show_db(self, headers: list, data: list, imgs: list):
 		rows_lens = [[len(col) for col in d] for d in [headers] + data]
 		cols_widths = [max(c_l) * 2 + 5 for c_l in zip(*rows_lens)]
@@ -22,4 +22,7 @@ class UniversalFrame(AnchorLayout):
 		))
 	
 	def start_stream(self, drone: Pioneer):
-		pass
+		self.add_widget(StreamView(drone))
+	
+	def stop_stream(self):
+		self.clear_widgets()

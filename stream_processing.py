@@ -44,29 +44,21 @@ def fragmentate_sing(img: Image.Image) -> tuple[Image.Image]:
 	img = ImageEnhance.Sharpness(img).enhance(5)
 	img = img.convert('L').point(lambda x: 255 if x > 100 else 0, mode='1')
 
+	left_chars = img.crop((
+		img.width * 0.05, img.height * 0.08,
+		img.width * 0.18, img.height * 0.9
+	))
+	left_chars = extend_image(left_chars)
 	numbers = img.crop((
 		img.width * 0.18, img.height * 0.08,
 		img.width * 0.5, img.height * 0.9
 	))
 	numbers = extend_image(numbers)
-
-	left_chars = img.crop((
-		img.width * 0.05, img.height * 0.08,
-		img.width * 0.18, img.height * 0.9
-	))
 	right_chars = img.crop((
 		img.width * 0.5, img.height * 0.08,
 		img.width * 0.73, img.height * 0.9
 	))
-	template = Image.new(
-		'RGB',
-		(left_chars.width + right_chars.width, left_chars.height),
-		(255, 255, 255)
-	)
-	template.paste(left_chars, (0, 0))
-	template.paste(right_chars, (left_chars.width, 0))
-	chars = extend_image(template)
-
+	right_chars = extend_image(right_chars)
 	region = img.crop((
 		img.width * 0.78, img.height * 0.08,
 		img.width * 0.96, img.height * 0.65
@@ -77,7 +69,6 @@ def fragmentate_sing(img: Image.Image) -> tuple[Image.Image]:
 
 def get_sign_str(fragments: Iterable[Image.Image]) -> str:
 	left_chars, numbers, right_chars, region = fragments
-
 	left_chars_str = pytesseract.image_to_string(left_chars).upper()
 	numbers_str = pytesseract.image_to_string(numbers, config='digits')
 	right_chars_str = pytesseract.image_to_string(right_chars).upper()
@@ -87,7 +78,7 @@ def get_sign_str(fragments: Iterable[Image.Image]) -> str:
 
 def get_sign_rect(img: np.array, rect: tuple[tuple, tuple]) -> np.array:
 	box = cv2.boxPoints(rect)
-	box = np.int0(box)
+	box = np.int0(box) # ?
 	W = rect[1][0]
 	H = rect[1][1]
 
@@ -102,10 +93,10 @@ def get_sign_rect(img: np.array, rect: tuple[tuple, tuple]) -> np.array:
 	center = ((x1 + x2) / 2, (y1 + y2) / 2)
 	size = (x2 - x1, y2 - y1)
 	matrix = cv2.getRotationMatrix2D((size[0] / 2, size[1] / 2), angle, 1.0)
+
 	cropped = cv2.getRectSubPix(img, size, center)
 	cropped = cv2.warpAffine(cropped, matrix, size)
-	cropped_w = H if H > W else W
-	cropped_h = H if H < W else W
+	cropped_w, cropped_h = max(H, W), min(H, W)
 	rotated = cv2.getRectSubPix(
             cropped,
             (int(cropped_w), int(cropped_h)),
@@ -118,16 +109,15 @@ def get_signs(img: np.array) -> list[tuple[str, tuple]]:
 	'''
 	Return list of tuples with sign number in format "A111AA22" and rectangle
 	'''
-	signs = []
 	img = cv2.medianBlur(img, 5, 0)
 	hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-	thresh = cv2.inRange(hsv, np.array(HSV_MIN, HSV_MAX)
+	thresh = cv2.inRange(hsv, HSV_MIN, HSV_MAX)
 	contours0, hierarchy=cv2.findContours(
 		thresh.copy(),
 		cv2.RETR_TREE,
 		cv2.CHAIN_APPROX_SIMPLE
 	)
-
+	signs = []
 	for cnt in contours0:
 		rect=cv2.minAreaRect(cnt)
 		area=int(rect[1][0] * rect[1][1])
@@ -145,3 +135,7 @@ def get_signs(img: np.array) -> list[tuple[str, tuple]]:
 			signs += [(sign_str, rect)]
 
 	return signs
+
+
+if __name__ == '__main__':
+	img = cv2.imread()

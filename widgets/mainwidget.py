@@ -14,20 +14,22 @@ from widgets.universalframe import UniversalFrame
 class MainWidget(MDBoxLayout):
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
-		# self.drone = Pioneer()
+		self.drone = Pioneer()
+		# self.drone = None
 		self.frame = UniversalFrame()
 		self.add_widget(self.frame)
 
-		btns_data = {
+		self.btns_data = {
                     'Start': self.act_drone_start,
                     'Patrolling': self.act_drone_patrolling,
                     'Back': self.act_drone_back,
-                    'Test': self.act_dron_test,
+               					'Land': self.act_drone_land,
+                    'Test': self.act_drone_test,
                     'People DB': partial(self.act_dbview, 'people'),
                     'Cars DB': partial(self.act_dbview, 'cars'),
                     'Offences': partial(self.act_dbview, 'offences')
 		}
-		self.sidebar = SideBar(btns_data)
+		self.sidebar = SideBar(self.btns_data)
 		self.add_widget(self.sidebar)
 
 		self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
@@ -36,21 +38,28 @@ class MainWidget(MDBoxLayout):
 	def act_drone_start(self, btn: SideButton = None):
 		print('Drone started')
 		self.drone.arm()
-		self.frame.start_stream()
+		self.frame.start_stream(self.drone)
 
 	def act_drone_patrolling(self, btn: SideButton = None):
 		print('Drone begin patrolling')
 		self.drone.takeoff()
+		self.drone.go_to_local_point(x=0, y=0, z=0.7, yaw=0)
 		self.drone.go_to_local_point(x=0, y=2, z=0.7, yaw=0)
 
 	def act_drone_back(self, btn: SideButton = None):
 		print('Drone come back')
 		self.drone.go_to_local_point(x=0, y=0, z=0.7, yaw=0)
-		self.drone.land()
+		self.drone.go_to_local_point(x=0, y=0, z=0, yaw=0)
 
-	def act_dron_test(self, btn: SideButton = None):
+	def act_drone_land(self, btn: SideButton = None):
+		print('Drone come back')
+		self.drone.land()
+		self.drone.disarm()
+
+	def act_drone_test(self, btn: SideButton = None):
 		print('Test drone')
-		self.drone.arm()
+		self.frame.start_stream(self.drone)
+		# self.frame.stop_stream()
 
 	def act_dbview(self, tablename: str, btn: SideButton = None):
 		headers, data, imgs = get_table_data(tablename)
@@ -61,16 +70,9 @@ class MainWidget(MDBoxLayout):
 		self._keyboard = None
 
 	def _on_keyboard_down(self, keyboard: Keyboard, keycode: tuple, text: str, modifiers: ObservableList):
-		key_to_act = {
-                    '1': self.act_drone_start,
-                    '2': self.act_drone_patrolling,
-                    '3': self.act_drone_back,
-                    '4': self.act_dron_test,
-                    '5': partial(self.act_dbview, 'people'),
-                    '6': partial(self.act_dbview, 'cars'),
-                    '7': partial(self.act_dbview, 'offences')
-		}
-		if keycode[1] in key_to_act:
-			key_to_act[keycode[1]]()
-
+		if keycode[1].isdigit():
+			try:
+				tuple(self.btns_data.values())[int(keycode[1]) - 1]()
+			except IndexError:
+				pass
 		return True

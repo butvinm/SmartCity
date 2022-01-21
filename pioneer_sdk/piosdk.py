@@ -10,11 +10,14 @@ class Pioneer:
                  pioneer_mavlink_port=8001, logger=True):
         self.__VIDEO_BUFFER = 65535
         video_control_address = (pioneer_ip, pioneer_video_control_port)
-        self.__video_control_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.__video_control_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.__video_control_socket = socket.socket(
+            socket.AF_INET, socket.SOCK_STREAM)
+        self.__video_control_socket.setsockopt(
+            socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.__video_control_socket.settimeout(5)
         self.__video_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.__video_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.__video_socket.setsockopt(
+            socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.__video_socket.settimeout(5)
 
         self.__video_frame_buffer = bytes()
@@ -28,7 +31,8 @@ class Pioneer:
         try:
             self.__video_control_socket.connect(video_control_address)
             self.__video_socket.bind(self.__video_control_socket.getsockname())
-            self.__mavlink_socket = mavutil.mavlink_connection('udpout:%s:%s' % (pioneer_ip, pioneer_mavlink_port))
+            self.__mavlink_socket = mavutil.mavlink_connection(
+                'udpout:%s:%s' % (pioneer_ip, pioneer_mavlink_port))
         except socket.error:
             print('Can not connect to pioneer. Do you connect to drone wifi?')
             sys.exit()
@@ -36,7 +40,7 @@ class Pioneer:
         self.__init_heartbeat_event = threading.Event()
 
         self.__heartbeat_thread = threading.Thread(target=self.__heartbeat_handler,
-                                                   args= (self.__init_heartbeat_event, ))
+                                                   args=(self.__init_heartbeat_event, ))
         self.__heartbeat_thread.daemon = True
         self.__heartbeat_thread.start()
 
@@ -49,7 +53,8 @@ class Pioneer:
     def get_raw_video_frame(self):
         try:
             while True:
-                self.__video_frame_buffer += self.__video_socket.recv(self.__VIDEO_BUFFER)
+                self.__video_frame_buffer += self.__video_socket.recv(
+                    self.__VIDEO_BUFFER)
                 beginning = self.__video_frame_buffer.find(b'\xff\xd8')
                 end = self.__video_frame_buffer.find(b'\xff\xd9')
                 if beginning != -1 and end != -1 and end > beginning:
@@ -259,7 +264,8 @@ class Pioneer:
                 if ack is not None:
                     if ack:
                         if self.__logger:
-                            print('LUA script command: %s complete' % input_state)
+                            print('LUA script command: %s complete' %
+                                  input_state)
                         break
                     else:
                         i += 1
@@ -296,7 +302,8 @@ class Pioneer:
             else:
                 led_id_print = led_id
             if self.__logger:
-                print('LED id: %s R: %i ,G: %i, B: %i send' % (led_id_print, r, g, b))
+                print('LED id: %s R: %i ,G: %i, B: %i send' %
+                      (led_id_print, r, g, b))
             while True:
                 self.__mavlink_socket.mav.command_long_send(
                     self.__mavlink_socket.target_system,  # target_system
@@ -314,7 +321,8 @@ class Pioneer:
                 if ack is not None:
                     if ack:
                         if self.__logger:
-                            print('LED id: %s RGB send complete' % led_id_print)
+                            print('LED id: %s RGB send complete' %
+                                  led_id_print)
                         break
                     else:
                         self.led_control(led_id, r, g, b)
@@ -367,7 +375,7 @@ class Pioneer:
                     send_time = time.time()
             else:
                 break
-
+		
     def point_reached(self, blocking=False):
         point_reached = self.__mavlink_socket.recv_match(type='MISSION_ITEM_REACHED', blocking=blocking,
                                                          timeout=self.__ack_timeout)
@@ -422,7 +430,8 @@ class Pioneer:
                 sys.stdout.flush()
                 return
         else:
-            curr_distance = float(dist_sensor_data.current_distance)/100  # cm to m
+            curr_distance = float(
+                dist_sensor_data.current_distance) / 100  # cm to m
             if self.__logger:
                 print("get dist sensor data: %5.2f m" % curr_distance)
             return curr_distance

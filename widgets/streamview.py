@@ -6,31 +6,31 @@ from kivy.uix.image import Image
 from kivy.uix.widget import Widget
 
 
-class StreamView(Image):
+class StreamView(Image):	
+	size_hint = 1, 1
+
 	def __init__(self, drone, **kwargs):
 		super().__init__(**kwargs)
 		self.drone = drone
+		self.update_trigger = Clock.create_trigger(
+			self._update_frame,
+			timeout=0.05,
+			interval=True
+		)
 
-	def on_kv_post(self, base_widget: Widget):
-		self.size_hint = None, None
-		self.allow_stretch = True
-		self.keep_ratio = False
-		self.opacity = 0
-		self.nocache = True
-		return super().on_kv_post(base_widget)
-
-	def start(self):
-		self.update_event = Clock.schedule_interval(self._update_frame, 0.1)
-
-	def stop(self):
-		pass
+	def on_parent(self, *args):
+		if self.parent is not None:
+			self.update_trigger()
+		else:
+			self.update_trigger.close()
 
 	def _bytes_to_img(self, image_bytes: bytes):
 		buf = io.BytesIO(image_bytes)
-		cim = CoreImage(buf, ext='jpg')
+		cim = CoreImage(buf, ext='png')
 		return Image(texture=cim.texture)
 
-	def _update_frame(self):
+	def _update_frame(self, *args):
+		print('Update frame')
 		camera_frame = self.drone.get_raw_video_frame()
-		image = self.bytes_to_img(camera_frame)
-		self.canvas = image.canvas
+		image = self._bytes_to_img(camera_frame)
+		self.texture = image.texture
