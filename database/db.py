@@ -42,3 +42,12 @@ def get_table_data(table_name: str) -> tuple[list]:
 
 	return headers, data, imgs
 
+
+def get_bad_people() -> list[tuple[int, str]]:
+	headers, data, imgs = get_table_data('people')
+	return [(i, ' '.join(info[:3])) for i, info in enumerate(data) if info[-1] == 'В розыске']
+
+
+def get_bad_cars() -> dict[str, str]:
+	headers, data, imgs = get_table_data('cars')
+	return {info[9]: info[10] for info in data if info[10]}

@@ -14,52 +14,57 @@ from widgets.universalframe import UniversalFrame
 class MainWidget(MDBoxLayout):
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
-		self.drone = Pioneer()
-		# self.drone = None
 		self.frame = UniversalFrame()
 		self.add_widget(self.frame)
 
 		self.btns_data = {
-                    'Start': self.act_drone_start,
+                    'Connect drone': self.act_drone_connect,
+               	    'Start': self.act_drone_start,
                     'Patrolling': self.act_drone_patrolling,
-                    'Back': self.act_drone_back,
-               					'Land': self.act_drone_land,
+                    'Land': self.act_drone_land,
                     'Test': self.act_drone_test,
                     'People DB': partial(self.act_dbview, 'people'),
                     'Cars DB': partial(self.act_dbview, 'cars'),
-                    'Offences': partial(self.act_dbview, 'offences')
 		}
 		self.sidebar = SideBar(self.btns_data)
 		self.add_widget(self.sidebar)
 
+		self.drone = None
 		self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
 		self._keyboard.bind(on_key_down=self._on_keyboard_down)
 
+	def act_drone_connect(self, btn: SideButton = None):
+		if self.drone is None:
+			self.drone = Pioneer(logger=False)
+
 	def act_drone_start(self, btn: SideButton = None):
-		print('Drone started')
-		self.drone.arm()
-		self.frame.start_stream(self.drone)
+		if self.drone is not None:
+			print('Drone has been started')
+			self.drone.arm()
+			self.frame.start_stream(self.drone)
 
 	def act_drone_patrolling(self, btn: SideButton = None):
-		print('Drone begin patrolling')
-		self.drone.takeoff()
-		self.drone.go_to_local_point(x=0, y=0, z=0.7, yaw=0)
-		self.drone.go_to_local_point(x=0, y=2, z=0.7, yaw=0)
-
-	def act_drone_back(self, btn: SideButton = None):
-		print('Drone come back')
-		self.drone.go_to_local_point(x=0, y=0, z=0.7, yaw=0)
-		self.drone.go_to_local_point(x=0, y=0, z=0, yaw=0)
+		if self.drone is not None:
+			print('Drone begin patrolling')
+			self.drone.takeoff()
+			self.drone.go_to_local_point(x=0, y=0, z=0.5, yaw=0)
+			self.drone.go_to_local_point(x=0, y=1.5, z=0.5, yaw=0)
+			# self.drone.go_to_local_point(x=0, y=2, z=0.7, yaw=math.radians(180))
+			# self.drone.go_to_local_point(x=0, y=0, z=0.7, yaw=math.radians(180))
+			# self.drone.go_to_local_point(x=0, y=0, z=0, yaw=math.radians(180))
+			print('Patrolling is finished')
 
 	def act_drone_land(self, btn: SideButton = None):
-		print('Drone come back')
-		self.drone.land()
-		self.drone.disarm()
+		if self.drone is not None:
+			print('Drone is landing')
+			self.drone.land()
+			self.drone.disarm()
+			self.frame.stop_stream()
 
 	def act_drone_test(self, btn: SideButton = None):
-		print('Test drone')
-		self.frame.start_stream(self.drone)
-		# self.frame.stop_stream()
+		if self.drone is not None:
+			print('Test drone')
+			print('\n' * 5, self.drone.point_reached())
 
 	def act_dbview(self, tablename: str, btn: SideButton = None):
 		headers, data, imgs = get_table_data(tablename)
