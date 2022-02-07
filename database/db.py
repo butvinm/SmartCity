@@ -1,8 +1,7 @@
 import csv
 import os
 import sqlite3
-from venv import create
-
+from asyncio import SelectorEventLoop
 DBPATH = 'database/database.db'
 
 
@@ -26,7 +25,7 @@ def table_from_csv(csvpath: str, table_name: str):
 	con.close()
 
 
-def get_table_data(table_name: str) -> tuple[list]:
+def get_table_data(table_name: str) -> tuple[list, list, dict[int, str]]:
 	con = sqlite3.connect(DBPATH)
 	cur = con.cursor()
 	query = f'SELECT * from {table_name}'
@@ -36,16 +35,20 @@ def get_table_data(table_name: str) -> tuple[list]:
 
 	imgs_folder = os.path.join(os.getcwd(), 'database', f'{table_name}_imgs')
 	if os.path.exists(imgs_folder):
-		imgs = [os.path.join(imgs_folder, path) for path in os.listdir(imgs_folder)]
+		imgs = {int(path.split('.')[0]): os.path.join(imgs_folder, path)
+                    for path in os.listdir(imgs_folder)}
 	else:
 		imgs = None
 
 	return headers, data, imgs
 
 
-def get_bad_people() -> list[tuple[int, str]]:
+def get_bad_people() -> list[tuple[list, list]]:
 	headers, data, imgs = get_table_data('people')
-	return [(i, ' '.join(info[:3])) for i, info in enumerate(data) if info[-1] == 'В розыске']
+	return [
+		[data[index] for index in imgs],
+		list(imgs.values())
+	]
 
 
 def get_bad_cars() -> dict[str, str]:

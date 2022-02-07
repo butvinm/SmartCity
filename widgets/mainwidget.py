@@ -8,6 +8,7 @@ from pioneer_sdk import Pioneer
 
 from widgets.sidebar import SideBar
 from widgets.sidebutton import SideButton
+from widgets.sidecheckbox import SideCheckbox
 from widgets.universalframe import UniversalFrame
 
 
@@ -17,6 +18,10 @@ class MainWidget(MDBoxLayout):
 		self.frame = UniversalFrame()
 		self.add_widget(self.frame)
 
+		self.checkboxes = {
+			'faces': SideCheckbox('faces'),
+			'signs': SideCheckbox('signs'),
+		}
 		self.btns_data = {
                     'Connect drone': self.act_drone_connect,
                	    'Start': self.act_drone_start,
@@ -26,7 +31,7 @@ class MainWidget(MDBoxLayout):
                     'People DB': partial(self.act_dbview, 'people'),
                     'Cars DB': partial(self.act_dbview, 'cars'),
 		}
-		self.sidebar = SideBar(self.btns_data)
+		self.sidebar = SideBar(self.btns_data, self.checkboxes)
 		self.add_widget(self.sidebar)
 
 		self.drone = None
@@ -41,7 +46,9 @@ class MainWidget(MDBoxLayout):
 		if self.drone is not None:
 			print('Drone has been started')
 			self.drone.arm()
-			self.frame.start_stream(self.drone)
+			mode = ('signs' if self.checkboxes['signs'].checked else '') + \
+                            ('faces' if self.checkboxes['faces'].checked else '')
+			self.frame.start_stream(self.drone, mode)
 
 	def act_drone_patrolling(self, btn: SideButton = None):
 		if self.drone is not None:
@@ -62,9 +69,7 @@ class MainWidget(MDBoxLayout):
 			self.frame.stop_stream()
 
 	def act_drone_test(self, btn: SideButton = None):
-		if self.drone is not None:
-			print('Test drone')
-			print('\n' * 5, self.drone.point_reached())
+		self.frame.start_stream(self.drone, 'signs')
 
 	def act_dbview(self, tablename: str, btn: SideButton = None):
 		headers, data, imgs = get_table_data(tablename)

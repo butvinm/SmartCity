@@ -21,8 +21,8 @@ class UniversalFrame(AnchorLayout):
 			row_data=data
 		))
 	
-	def start_stream(self, drone: Pioneer):
-		self.add_widget(StreamView(drone, 'signs'))
+	def start_stream(self, drone: Pioneer, mode: str):
+		self.add_widget(StreamView(drone, mode))
 	
 	def stop_stream(self):
 		self.clear_widgets()
