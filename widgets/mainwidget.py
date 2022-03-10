@@ -69,7 +69,7 @@ class MainWidget(MDBoxLayout):
 			self.frame.stop_stream()
 
 	def act_drone_test(self, btn: SideButton = None):
-		self.frame.start_stream(self.drone, 'signs')
+		self.frame.start_stream(self.drone, 'signs&faces')
 
 	def act_dbview(self, tablename: str, btn: SideButton = None):
 		headers, data, imgs = get_table_data(tablename)

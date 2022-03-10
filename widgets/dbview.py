@@ -8,7 +8,7 @@ class DBView(MDDataTable):
 	
 	def __init__(self, imgs: dict[int, str], **kwargs):
 		super().__init__(**kwargs)
-		self.imgs = imgs if imgs else []
+		self.imgs = imgs if imgs else dict()
 		self.bind(on_row_press=self._on_row_press)
 	
 	def _on_row_press(self, instance_table: MDDataTable, instance_cell: CellRow):

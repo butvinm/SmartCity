@@ -83,15 +83,29 @@ def img_to_buf(img: np.array) -> bytes:
 
 
 if __name__ == '__main__':
-	bad_people = get_bad_people()
-	# [print(item) for item in bad_people]
-	img = cv2.imread('database/test_face_1.jpg')
-	faces = faces_from_frame(img)
-	for data, rect in faces:
-		top, right, bottom, left = rect
-		img = cv2.rectangle(img, (left, top), (right, bottom), RED, 2)
-		img = put_text(img, ' '.join(data[:3]), (left, bottom))
+	# bad_people = get_bad_people()
+	# # [print(item) for item in bad_people]
+	# img = cv2.imread('database/test_face_1.jpg')
+	# faces = faces_from_frame(img)
+	# for data, rect in faces:
+	# 	top, right, bottom, left = rect
+	# 	img = cv2.rectangle(img, (left, top), (right, bottom), RED, 2)
+	# 	img = put_text(img, ' '.join(data[:3]), (left, bottom))
 	
-	img = cv2.resize(img, (0, 0), fx=0.5, fy=0.5)
-	cv2.imshow('Frame', img)
+	# img = cv2.resize(img, (0, 0), fx=0.5, fy=0.5)
+	# cv2.imshow('Frame', img)
+	# cv2.waitKey()
+	bad_cars = get_bad_cars()
+	img = cv2.imread('./database/test_signs_image.png')
+	signs = signs_from_frame(img)
+	print(signs)
+	for sign in signs:
+		offence = bad_cars.get(sign[0], None)
+		if offence is not None:
+			img = draw_sign(
+				img,
+				offence,
+				sign[1]
+			)
+	cv2.imshow('1', img)
 	cv2.waitKey()

@@ -160,7 +160,7 @@ def get_relative_rects(contours: list[np.array]) -> list[tuple]:
 	return rects
 
 
-def get_sign(img: np.array, rect: tuple[tuple, tuple]) -> 'str|None':
+def get_sign(img: np.array, rect: tuple[tuple, tuple]) -> str:
 	sign = get_sign_rect(img, rect)
 	pil_img = Image.fromarray(cv2.cvtColor(sign, cv2.COLOR_BGR2RGB))
 	refrag_sign = refragmentate_sing(pil_img)
@@ -174,6 +174,7 @@ def signs_from_frame(img: np.array) -> list[tuple[str, tuple]]:
 	img = cv2.medianBlur(img, 5, 0)
 	hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 	thresh = cv2.inRange(hsv, HSV_MIN, HSV_MAX)
+	cv2.imshow('2', thresh)
 	contours, _ = cv2.findContours(
 		thresh.copy(),
 		cv2.RETR_TREE,
@@ -202,4 +203,4 @@ if __name__ == '__main__':
 	# signs = signs_from_file('database/test_signs_image.png')
 	# print('Full time:', time() - st)
 	# print(signs)
-	set_hsv('database/test_sing.png')
+	set_hsv('database/test_signs_image.png')
