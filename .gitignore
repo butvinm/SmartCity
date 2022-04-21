@@ -1,2 +1,5 @@
 /database/test_signs_image.png
+__pycache__/
+*.py[cod]
+*$py.class
 .gitignore

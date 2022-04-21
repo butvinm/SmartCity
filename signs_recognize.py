@@ -13,7 +13,7 @@ SIGN_MIN_AREA = 40000
 SIGN_MAX_AREA = 80000
 SIGN_MIN_RATIO = 4
 SIGN_MAX_RATIO = 6
-HSV_MIN = np.array((140, 0, 0), np.uint8)
+HSV_MIN = np.array((39, 18, 135), np.uint8)
 HSV_MAX = np.array((255, 255, 255), np.uint8)
 
 
@@ -40,6 +40,9 @@ def set_hsv(path: str = 'database/test_signs_image.png'):
 		cv2.imshow('1', hsv)
 		if cv2.waitKey(5) == 27:
 			break
+	
+	print(min_hsv)
+	print(max_hsv)
 	cv2.destroyAllWindows()
 
 
