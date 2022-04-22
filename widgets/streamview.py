@@ -2,13 +2,13 @@ import io
 
 import numpy as np
 from database.db import get_bad_cars, get_bad_people
-# from faces_recognize import faces_from_frame
+from faces_recognize import faces_from_frame
 from kivy.clock import Clock
 from kivy.core.image import Image as CoreImage
 from kivy.uix.image import Image
 from pioneer_sdk import Pioneer
 from signs_recognize import signs_from_frame
-# from stream_utils import draw_face, draw_sign, frame_to_cv2img, img_to_buf
+from stream_utils import draw_face, draw_sign, frame_to_cv2img, img_to_buf
 
 
 class StreamView(Image):
