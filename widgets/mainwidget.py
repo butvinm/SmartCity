@@ -54,6 +54,7 @@ class MainWidget(MDBoxLayout):
 			self.drone.arm()
 			mode = ('signs' if self.checkboxes['signs'].checked else '') + \
                             ('faces' if self.checkboxes['faces'].checked else '')
+
 			self.frame.start_stream(self.drone, mode)
 
 	def act_drone_patrolling(self, btn: SideButton = None):

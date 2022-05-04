@@ -70,13 +70,16 @@ class StreamView(Image):
 			self._faces = faces_from_frame(self._last_frame)
 
 	def _update_frame(self, *args):
-		camera_frame = self.drone.get_raw_video_frame()
-		self._last_frame = frame_to_cv2img(camera_frame)
-		if 'signs' in self._mode:
-			img = self._frame_process_signs()
-		if 'faces' in self._mode:
-			img = self._frame_process_faces()
-
-		img_buf = img_to_buf(img)
-		frame = self._bytes_to_frame(img_buf)
-		self.texture = frame.texture
+		try:
+			camera_frame = self.drone.get_raw_video_frame()
+			self._last_frame = frame_to_cv2img(camera_frame)
+			img = self._last_frame
+			if 'signs' in self._mode:
+				img = self._frame_process_signs()
+			if 'faces' in self._mode:
+				img = self._frame_process_faces()
+			img_buf = img_to_buf(img)
+			frame = self._bytes_to_frame(img_buf)
+			self.texture = frame.texture
+		except:
+			pass

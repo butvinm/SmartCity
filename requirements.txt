@@ -2,3 +2,5 @@ cv2
 numpy
 kivy
 kivymd
+face_recognition
+pytesseract

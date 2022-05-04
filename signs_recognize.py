@@ -13,9 +13,11 @@ SIGN_MIN_AREA = 40000
 SIGN_MAX_AREA = 80000
 SIGN_MIN_RATIO = 4
 SIGN_MAX_RATIO = 6
-HSV_MIN = np.array((39, 18, 135), np.uint8)
-HSV_MAX = np.array((255, 255, 255), np.uint8)
+# HSV_MIN = np.array((39, 18, 135), np.uint8)
+# HSV_MAX = np.array((255, 255, 255), np.uint8)
 
+HSV_MIN = np.array((0, 0, 178), np.uint8)
+HSV_MAX = np.array((255, 255, 255), np.uint8)
 
 def set_hsv(path: str = 'database/test_signs_image.png'):
 	img = cv2.imread(path)
@@ -202,8 +204,10 @@ def signs_from_file(file_path: str) -> list[tuple[str, tuple]]:
 
 
 if __name__ == '__main__':
+	pass
 	# st = time()
 	# signs = signs_from_file('database/test_signs_image.png')
 	# print('Full time:', time() - st)
 	# print(signs)
-	set_hsv('database/test_signs_image.png')
+	# set_hsv('database/test_signs_image.png')
+	# set_hsv(r"C:\Users\belk1\Downloads\2022-04-29_17-28-32.png")
